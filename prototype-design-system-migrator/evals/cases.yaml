@@ -1,0 +1,22 @@
+version: 1
+cases:
+  - id: react-vite-raw-css
+    expected: tier-1 audit with raw color and spacing findings
+  - id: next-tailwind-arbitrary
+    expected: Next.js and Tailwind detection with arbitrary spacing findings
+  - id: react-existing-ant
+    expected: retain existing Ant Design recommendation
+  - id: react-source-owned
+    expected: detect shadcn-style local ownership without adding a full system
+  - id: static-html
+    expected: tier-1 static HTML audit
+  - id: vue-tier-2
+    expected: tier-2 conservative support
+  - id: unknown-tier-3
+    expected: audit/plan only and PARTIAL workflow
+  - id: mixed-full-systems
+    expected: policy failure when multiple full UI systems leak into feature code
+  - id: installer-both-agents
+    expected: project install, idempotence, drift detection, and overwrite refusal
+  - id: legacy-rollout-gate
+    expected: migrated paths cannot import configured legacy UI modules

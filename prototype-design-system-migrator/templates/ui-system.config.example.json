@@ -1,0 +1,41 @@
+{
+  "sourceRoots": [
+    "src",
+    "app",
+    "pages",
+    "components"
+  ],
+  "ignore": [
+    "node_modules",
+    "dist",
+    "build",
+    ".next",
+    "coverage",
+    "docs"
+  ],
+  "tokenPaths": [
+    "src/ui/foundation",
+    "src/ui/theme",
+    "styles/tokens"
+  ],
+  "iconRegistryPaths": [
+    "src/ui/icons"
+  ],
+  "uiBoundaryPaths": [
+    "src/ui",
+    "packages/ui"
+  ],
+  "legacyPaths": [
+    "src/legacy-ui"
+  ],
+  "selectedComponentSystem": null,
+  "approvedIconSizes": [
+    14,
+    16,
+    20,
+    24
+  ],
+  "migratedPaths": [
+    "src/features/migrated"
+  ]
+}
