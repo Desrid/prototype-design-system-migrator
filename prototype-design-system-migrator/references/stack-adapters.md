@@ -4,7 +4,7 @@
 
 ### Tier 1
 
-Full v1 workflow:
+Primary guided workflow (runtime evidence is still required):
 
 - React with Vite;
 - Next.js;
@@ -16,7 +16,8 @@ Full v1 workflow:
 Audit, planning, tokens, and conservative migration where safe:
 
 - Vue and Nuxt;
-- Svelte and SvelteKit.
+- Svelte and SvelteKit;
+- Angular and Astro (discovery and conservative native-stack planning).
 
 Do not claim full support until stack-specific components and runtime tests exist.
 
@@ -26,7 +27,7 @@ Unknown or custom stack:
 
 - audit and plan only;
 - no speculative production migration;
-- status `PARTIAL` with exact missing adapter capabilities.
+- identify missing capabilities; an audit can be `READY` for its scope, but unsupported implementation remains `PARTIAL`.
 
 ## Adapter contract
 

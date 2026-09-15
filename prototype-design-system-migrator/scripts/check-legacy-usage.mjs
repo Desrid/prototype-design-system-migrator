@@ -1,5 +1,7 @@
 #!/usr/bin/env node
-import path from 'node:path';
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { imports, readAliases, resolveImport } from "./source-analysis.mjs";
 import {
   finishPolicyCheck,
   isWithin,
@@ -8,76 +10,78 @@ import {
   loadConfig,
   normalizePrefix,
   parseArgs,
-  readTextFiles
-} from './lib.mjs';
+  readTextFiles,
+} from "./lib.mjs";
 
-const args = parseArgs();
-const root = path.resolve(args.root || '.');
-const config = await loadConfig(root);
-const files = await readTextFiles(root, { ignore: config.ignore });
-const findings = [];
-const importRegex = /(?:from\s+|import\s*\()(["'])([^"']+)\1/g;
-const legacyPrefixes = config.legacyPaths.map(normalizePrefix).filter(Boolean);
-const migratedPrefixes = config.migratedPaths.map(normalizePrefix).filter(Boolean);
+export async function run(args = parseArgs()) {
+  const root = path.resolve(args.root || ".");
+  const config = args.config || (await loadConfig(root));
+  const files = args.files || (await readTextFiles(root, { config }));
+  const findings = [];
+  const aliasInfo = await readAliases(root, config.aliases);
+  const legacyPrefixes = config.legacyPaths
+    .map(normalizePrefix)
+    .filter(Boolean);
+  const migratedPrefixes = config.migratedPaths
+    .map(normalizePrefix)
+    .filter(Boolean);
 
-for (const { relPath, text } of files) {
-  if (isWithin(relPath, legacyPrefixes)) continue;
-  if (migratedPrefixes.length && !isWithin(relPath, migratedPrefixes)) continue;
+  for (const { relPath, text } of files) {
+    if (isWithin(relPath, legacyPrefixes)) continue;
+    if (migratedPrefixes.length && !isWithin(relPath, migratedPrefixes))
+      continue;
 
-  for (const match of text.matchAll(importRegex)) {
-    const source = match[2];
-    if (!isLegacyImport({ source, importer: relPath, legacyPrefixes })) continue;
-    findings.push({
-      kind: 'legacy-ui-import',
-      file: relPath,
-      line: lineNumberAt(text, match.index ?? 0),
-      value: source,
-      excerpt: lineTextAt(text, match.index ?? 0)
-    });
-  }
-}
-
-await finishPolicyCheck({
-  title: 'Legacy UI usage check',
-  heuristic: true,
-  root,
-  summary: {
-    violations: findings.length,
-    legacyPaths: legacyPrefixes,
-    migratedPaths: migratedPrefixes.length ? migratedPrefixes : ['all non-legacy source files']
-  },
-  findings,
-  limitations: [
-    'Alias resolution is heuristic and may require target-project configuration.',
-    'Dynamic imports, re-exports, and dependency injection can hide legacy usage.',
-    'Use migratedPaths to turn this into a narrow rollout gate instead of a repository-wide inventory.'
-  ]
-}, args);
-
-function isLegacyImport({ source, importer, legacyPrefixes: prefixes }) {
-  const normalizedSource = source.replaceAll('\\', '/');
-  const importerDir = path.posix.dirname(importer);
-
-  if (normalizedSource.startsWith('.')) {
-    const resolved = path.posix.normalize(path.posix.join(importerDir, normalizedSource));
-    if (isWithin(stripKnownExtension(resolved), prefixes)) return true;
+    for (const item of imports(text)) {
+      const source = item.source;
+      if (!isLegacyImport({ source, importer: relPath, legacyPrefixes }))
+        continue;
+      findings.push({
+        kind: "legacy-ui-import",
+        file: relPath,
+        line: lineNumberAt(text, item.index),
+        value: source,
+        excerpt: lineTextAt(text, item.index),
+      });
+    }
   }
 
-  const dealiased = normalizedSource
-    .replace(/^@\//, 'src/')
-    .replace(/^~\//, 'src/')
-    .replace(/^\$lib\//, 'src/lib/');
-  if (isWithin(stripKnownExtension(dealiased), prefixes)) return true;
+  return await finishPolicyCheck(
+    {
+      title: "Legacy UI usage check",
+      heuristic: true,
+      root,
+      skippedFiles: files.diagnostics || [],
+      summary: {
+        violations: findings.length,
+        legacyPaths: legacyPrefixes,
+        migratedPaths: migratedPrefixes.length
+          ? migratedPrefixes
+          : ["all non-legacy source files"],
+      },
+      findings,
+      limitations: [
+        ...aliasInfo.unresolved,
+        "Computed imports and indirect re-exports need graph/runtime inspection.",
+        "Dynamic imports, re-exports, and dependency injection can hide legacy usage.",
+        "Use migratedPaths to turn this into a narrow rollout gate instead of a repository-wide inventory.",
+      ],
+    },
+    args,
+  );
 
-  return prefixes.some((prefix) => {
-    const basename = path.posix.basename(prefix);
-    return normalizedSource === basename
-      || normalizedSource.startsWith(`${basename}/`)
-      || normalizedSource.includes(`/${basename}/`)
-      || normalizedSource.endsWith(`/${basename}`);
-  });
-}
+  function isLegacyImport({ source, importer, legacyPrefixes: prefixes }) {
+    const resolved = resolveImport(source, importer, aliasInfo.aliases);
+    return isWithin(stripKnownExtension(resolved), prefixes);
+  }
 
-function stripKnownExtension(value) {
-  return value.replace(/\.(?:js|jsx|ts|tsx|mjs|cjs|vue|svelte)$/, '').replace(/\/index$/, '');
+  function stripKnownExtension(value) {
+    return value
+      .replace(/\.(?:js|jsx|ts|tsx|mjs|cjs|vue|svelte)$/, "")
+      .replace(/\/index$/, "");
+  }
 }
+if (
+  process.argv[1] &&
+  path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)
+)
+  await run();

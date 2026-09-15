@@ -1,41 +1,24 @@
 {
-  "sourceRoots": [
-    "src",
-    "app",
-    "pages",
-    "components"
-  ],
-  "ignore": [
-    "node_modules",
-    "dist",
-    "build",
-    ".next",
-    "coverage",
-    "docs"
-  ],
-  "tokenPaths": [
-    "src/ui/foundation",
-    "src/ui/theme",
-    "styles/tokens"
-  ],
-  "iconRegistryPaths": [
-    "src/ui/icons"
-  ],
-  "uiBoundaryPaths": [
-    "src/ui",
-    "packages/ui"
-  ],
-  "legacyPaths": [
-    "src/legacy-ui"
-  ],
+  "schemaVersion": 1,
+  "sourceRoots": ["."],
+  "ignore": ["**/*.generated.*"],
+  "tokenPaths": ["src/ui/foundation", "src/ui/theme", "styles/tokens"],
+  "iconRegistryPaths": ["src/ui/icons"],
+  "uiBoundaryPaths": ["src/ui", "packages/ui"],
+  "legacyPaths": ["src/legacy-ui"],
   "selectedComponentSystem": null,
-  "approvedIconSizes": [
-    14,
-    16,
-    20,
-    24
+  "iconPackages": [
+    "@tabler/icons-*",
+    "lucide*",
+    "@heroicons/*",
+    "react-icons",
+    "@fortawesome/*",
+    "@mui/icons-material",
+    "@phosphor-icons/*",
+    "@iconify/*"
   ],
-  "migratedPaths": [
-    "src/features/migrated"
-  ]
+  "approvedIconSizes": [],
+  "aliases": {},
+  "migratedPaths": [],
+  "exceptions": []
 }

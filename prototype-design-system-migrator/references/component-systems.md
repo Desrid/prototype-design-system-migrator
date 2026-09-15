@@ -28,14 +28,14 @@ Often the safest choice. Normalize naming, tokens, variants, accessibility, and 
 
 ## No new component library
 
-A valid outcome. Native elements, CSS, and local components may be more appropriate for static, small, or non-React prototypes.
+A valid outcome. Native semantic elements, shared DS styles, and local DS components may be more appropriate for static, small, or non-React prototypes. Browser-default control presentation is not an acceptable fallback.
 
 ## Public-boundary rule
 
-Feature code imports approved UI only through the target project's local boundary, for example:
+Prefer the project's existing stable public import boundary; add adapters where migration or product variants justify them. For example:
 
 ```ts
 import { Button, Dialog, Stack, SearchIcon } from "@/ui";
 ```
 
-Third-party imports are allowed inside adapters and the UI package, not throughout feature code.
+Enforce the DS public boundary within each application. The selected library can supply accessible behavior internally, but product features consume the fully themed DS API. Independent applications may own separate design systems. Follow `references/geometry-and-ds-acceptance.md` for exhaustive control ownership and opened-state acceptance.

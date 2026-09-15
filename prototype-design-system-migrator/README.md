@@ -7,7 +7,7 @@ A portable Codex and Claude Code skill for auditing and incrementally normalizin
 From a clone of this repository:
 
 ```bash
-node skills/prototype-design-system-migrator/scripts/install-skill.mjs \
+node prototype-design-system-migrator/scripts/install-skill.mjs \
   --agent both \
   --scope project \
   --target /path/to/prototype
@@ -16,7 +16,7 @@ node skills/prototype-design-system-migrator/scripts/install-skill.mjs \
 User-level installation:
 
 ```bash
-node skills/prototype-design-system-migrator/scripts/install-skill.mjs \
+node prototype-design-system-migrator/scripts/install-skill.mjs \
   --agent both \
   --scope user
 ```
@@ -24,7 +24,7 @@ node skills/prototype-design-system-migrator/scripts/install-skill.mjs \
 Preview without writing:
 
 ```bash
-node skills/prototype-design-system-migrator/scripts/install-skill.mjs \
+node prototype-design-system-migrator/scripts/install-skill.mjs \
   --agent both \
   --scope project \
   --target /path/to/prototype \
@@ -34,14 +34,14 @@ node skills/prototype-design-system-migrator/scripts/install-skill.mjs \
 Check for drift:
 
 ```bash
-node skills/prototype-design-system-migrator/scripts/install-skill.mjs \
+node prototype-design-system-migrator/scripts/install-skill.mjs \
   --agent both \
   --scope project \
   --target /path/to/prototype \
   --check
 ```
 
-The installer refuses to overwrite a locally modified installed copy unless `--force` is supplied.
+The installer refuses to overwrite a locally modified installed copy unless `--force` is supplied. Updates retain the prior installation in a sibling backup directory reported in the result; staging is verified before replacement.
 
 ## Invoke
 
@@ -68,7 +68,7 @@ rollout
 qa-only
 ```
 
-`audit-only` and `preserve` are the defaults.
+Review requests select `audit-only`; implementation requests proceed through the necessary phases. `preserve` is the default strategy.
 
 ## Examples
 
@@ -93,19 +93,23 @@ Use selected Open Props size values only as inputs to local primitive tokens. Do
 Introduce Tabler Icons safely:
 
 ```text
-Use Tabler Icons only if the current icon system is missing or inconsistent. Create a semantic local registry and wrapper, preserve logos, allow sizes 14/16/20/24, use stroke 2 and currentColor, and reject direct feature imports.
+Use Tabler Icons only if the current icon system is missing or inconsistent. Create a semantic local registry and wrapper, preserve logos, derive sizes and stroke from the product, use currentColor, and reject direct feature imports.
 ```
+
+## Automation
+
+See `references/automation.md` for configuration, project profiles, baseline-aware checks, exact reviewed transformations, and resuming from source snapshots. Use `scripts/run-checks.mjs` to share one source read across policy checks. Keep Storybook current according to `references/storybook.md`.
 
 ## Static tools
 
 ```bash
-node skills/prototype-design-system-migrator/scripts/detect-stack.mjs --root . --json
-node skills/prototype-design-system-migrator/scripts/inventory-ui.mjs --root . --out docs/ui-system-migration/inventory.json
-node skills/prototype-design-system-migrator/scripts/check-token-usage.mjs --root .
-node skills/prototype-design-system-migrator/scripts/check-spacing-usage.mjs --root .
-node skills/prototype-design-system-migrator/scripts/check-icon-imports.mjs --root .
-node skills/prototype-design-system-migrator/scripts/check-library-mixing.mjs --root .
-node skills/prototype-design-system-migrator/scripts/check-legacy-usage.mjs --root .
+node prototype-design-system-migrator/scripts/detect-stack.mjs --root . --json
+node prototype-design-system-migrator/scripts/inventory-ui.mjs --root . --out docs/ui-system-migration/inventory.json
+node prototype-design-system-migrator/scripts/check-token-usage.mjs --root .
+node prototype-design-system-migrator/scripts/check-spacing-usage.mjs --root .
+node prototype-design-system-migrator/scripts/check-icon-imports.mjs --root .
+node prototype-design-system-migrator/scripts/check-library-mixing.mjs --root .
+node prototype-design-system-migrator/scripts/check-legacy-usage.mjs --root .
 ```
 
 The scanners are heuristic. They produce evidence; they do not prove design quality or runtime correctness.
@@ -113,8 +117,9 @@ The scanners are heuristic. They produce evidence; they do not prove design qual
 ## Validate this package
 
 ```bash
-node skills/prototype-design-system-migrator/scripts/validate-skill-package.mjs
-node skills/prototype-design-system-migrator/evals/run-static-evals.mjs
+node prototype-design-system-migrator/scripts/validate-skill-package.mjs
+node prototype-design-system-migrator/evals/run-static-evals.mjs
+node prototype-design-system-migrator/evals/run-regression-evals.mjs
 ```
 
 ## Status semantics
@@ -127,9 +132,17 @@ node skills/prototype-design-system-migrator/evals/run-static-evals.mjs
 
 Migration changes should be isolated on a branch or worktree and split into narrow commits. Revert the pilot or component-family commit rather than deleting the local UI layer blindly. Installed skill copies can be removed from `.agents/skills/prototype-design-system-migrator` and `.claude/skills/prototype-design-system-migrator`; this does not revert product migrations.
 
+## Geometry and DS acceptance
+
+Version 0.3.0 requires complete in-scope geometry/state coverage and fully themed DS controls, including opened popups. See `references/geometry-and-ds-acceptance.md`. The combined policy runner includes `check-native-controls.mjs`; rendered acceptance remains mandatory.
+
+## Verification record
+
+See `evals/evidence/2026-09-15-optimization.md` for v0.2.0 checks and their limits.
+
 ## Known limitations
 
 - Static scanners cannot see every runtime or generated style.
-- Vue, Nuxt, Svelte, and SvelteKit support is conservative Tier 2 in v0.1.0.
+- Vue, Nuxt, Svelte, and SvelteKit support is conservative Tier 2 in v0.2.0.
 - Unknown stacks are audit/plan only.
 - Real clean Codex and Claude Code fixture runs are still required before the package can claim READY cross-agent compatibility.

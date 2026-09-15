@@ -13,10 +13,16 @@ cases:
   - id: vue-tier-2
     expected: tier-2 conservative support
   - id: unknown-tier-3
-    expected: audit/plan only and PARTIAL workflow
+    expected: audit/plan only; unsupported implementation identified explicitly
   - id: mixed-full-systems
     expected: policy failure when multiple full UI systems leak into feature code
   - id: installer-both-agents
     expected: project install, idempotence, drift detection, and overwrite refusal
   - id: legacy-rollout-gate
     expected: migrated paths cannot import configured legacy UI modules
+
+  - id: optimization-regressions
+    expected: run-regression-evals.mjs verifies 21 executable cases, including scope, baseline, transforms, and resume freshness
+
+  - id: ds-control-ownership
+    expected: five additional regression scenarios enforce native-control boundaries, opened-widget review, hidden form helpers, and completed-scope checks

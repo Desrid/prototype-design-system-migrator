@@ -2,7 +2,7 @@
 
 ## Default policy
 
-Use the product's coherent existing icon set when one exists. Use Tabler Icons as the default product-facing system when the icon language is missing, inconsistent, or explicit standardization was requested.
+Use the product's coherent existing icon set when one exists. When no coherent icon set exists, choose a compatible set using product style, stack, and dependency evidence. Tabler is one option, not a requirement.
 
 ## Local registry
 
@@ -15,10 +15,10 @@ export { IconPlus as AddIcon } from "@tabler/icons-react";
 
 ## Defaults
 
-- approved sizes: 14, 16, 20, and 24;
-- stroke width: 2;
+- derive approved sizes from the product;
+- preserve the selected set's coherent stroke/weight conventions;
 - color: `currentColor`;
-- one semantic action uses one icon consistently.
+- one semantic action uses one icon consistently; several semantic names may share a glyph, but a name must not resolve ambiguously.
 
 ## Accessibility
 
@@ -26,8 +26,8 @@ Decorative icons are hidden from assistive technology. Icon-only controls have a
 
 ## Prohibitions
 
-- no emoji or Unicode symbols as interface icons;
-- no icon fonts, text glyphs, or CSS drawings as replacements;
-- no direct Tabler imports in feature code;
+- review ambiguous text or emoji icon substitutes; preserve intentional product content and coherent accessible incumbent glyphs;
+- avoid introducing inconsistent icon fonts, text glyphs, or CSS drawings during migration;
+- keep selected third-party icon sources behind the configured boundary; `iconPackages` controls static enforcement;
 - no replacement of logos, brand marks, or illustrations;
 - no fragile overrides of private third-party internal icons.
